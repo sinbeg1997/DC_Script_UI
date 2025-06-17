@@ -1,130 +1,143 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create DC Script</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DC Script UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center h-screen">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-4 text-center">Create DC Script</h1>
-        <div class="mb-4">
-            <label for="luaFile" class="block text-sm font-medium text-gray-700">Tải lên file DC_Mobile_vi.lua</label>
-            <input type="file" id="luaFile" accept=".lua" class="mt-1 p-2 w-full border rounded-md">
+      <h1 class="text-2xl font-bold mb-4 text-center">DC Script UI</h1>
+      <div class="mb-4">
+        <label for="luaFile" class="block text-sm font-medium text-gray-700"
+          >Tải lên file DC_Mobile_vi.lua</label
+        >
+        <input
+          type="file"
+          id="luaFile"
+          accept=".lua"
+          class="mt-1 p-2 w-full border rounded-md"
+        />
+      </div>
+      <div id="userIdsContainer" class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">User IDs</label>
+        <div class="flex items-center mt-1">
+          <input
+            type="text"
+            class="userIdInput p-2 w-full border rounded-md"
+            placeholder="3340688734138486993"
+          />
         </div>
-        <div id="userIdsContainer" class="mb-4">
-            <label class="block text-sm font-medium text-gray-700">User IDs</label>
-            <div class="flex items-center mt-1">
-                <input type="text" class="userIdInput p-2 w-full border rounded-md" placeholder="3340688734138486993">
-            </div>
-        </div>
-        <button onclick="addUserIdInput()" class="mb-4 bg-green-500 text-white p-2 rounded-md hover:bg-green-600">+ Thêm User ID</button>
-        <div class="mb-4">
-            <label for="expiredDate" class="block text-sm font-medium text-gray-700">Expired Date (dd-mm-yyyy)</label>
-            <input type="date" id="expiredDate" class="mt-1 p-2 w-full border rounded-md">
-        </div>
-        <button onclick="updateLuaFile()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600" disabled id="updateButton">Tạo và tải file Lua</button>
+      </div>
+      <button
+        onclick="addUserIdInput()"
+        class="mb-4 bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
+      >
+        + Thêm User ID
+      </button>
+      <div class="mb-4">
+        <label for="expiredDate" class="block text-sm font-medium text-gray-700"
+          >Expired Date</label
+        >
+        <input
+          type="date"
+          id="expiredDate"
+          class="mt-1 p-2 w-full border rounded-md"
+        />
+      </div>
+      <button
+        onclick="updateLuaFile()"
+        class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
+        disabled
+        id="updateButton"
+      >
+        Tạo và tải file Lua
+      </button>
     </div>
 
     <script>
-        const luaFileInput = document.getElementById('luaFile');
-        const updateButton = document.getElementById('updateButton');
-        const userIdsContainer = document.getElementById('userIdsContainer');
-        let userIdInputCount = 1;
+      const luaFileInput = document.getElementById("luaFile");
+      const updateButton = document.getElementById("updateButton");
+      const userIdsContainer = document.getElementById("userIdsContainer");
+      let userIdInputCount = 1;
 
-        // Enable button only after file is uploaded
-        luaFileInput.addEventListener('change', () => {
-            updateButton.disabled = !luaFileInput.files.length;
-        });
+      // Enable button only after file is uploaded
+      luaFileInput.addEventListener("change", () => {
+        updateButton.disabled = !luaFileInput.files.length;
+      });
 
-        // Function to format date to dd-mm-yyyy
-        function formatDate(date) {
-            if (!date) return '';
-            const d = new Date(date);
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const year = d.getFullYear();
-            return `${day}-${month}-${year}`;
-        }
-
-        // Add new userId input field
-        function addUserIdInput() {
-            userIdInputCount++;
-            const newInputDiv = document.createElement('div');
-            newInputDiv.className = 'flex items-center mt-2';
-            newInputDiv.innerHTML = `
+      // Add new userId input field
+      function addUserIdInput() {
+        userIdInputCount++;
+        const newInputDiv = document.createElement("div");
+        newInputDiv.className = "flex items-center mt-2";
+        newInputDiv.innerHTML = `
                 <input type="text" class="userIdInput p-2 w-full border rounded-md" placeholder="Nhập User ID">
                 <button onclick="removeUserIdInput(this)" class="ml-2 bg-red-500 text-white p-2 rounded-md hover:bg-red-600">-</button>
             `;
-            userIdsContainer.appendChild(newInputDiv);
+        userIdsContainer.appendChild(newInputDiv);
+      }
+
+      // Remove userId input field
+      function removeUserIdInput(button) {
+        if (userIdInputCount > 1) {
+          button.parentElement.remove();
+          userIdInputCount--;
+        }
+      }
+
+      function updateLuaFile() {
+        const userIdInputs = document.getElementsByClassName("userIdInput");
+        const expiredDate = document.getElementById("expiredDate").value;
+        const luaFile = luaFileInput.files[0];
+
+        // Validate inputs
+        if (!luaFile) {
+          alert("Vui lòng tải lên file Lua.");
+          return;
+        }
+        const userIds = Array.from(userIdInputs)
+          .map((input) => input.value.trim())
+          .filter((id) => id);
+        if (userIds.length === 0 || !expiredDate) {
+          alert("Vui lòng nhập ít nhất một User ID và chọn Expired Date.");
+          return;
         }
 
-        // Remove userId input field
-        function removeUserIdInput(button) {
-            if (userIdInputCount > 1) {
-                button.parentElement.remove();
-                userIdInputCount--;
-            }
-        }
+        // Format userIds as Lua array
+        const userIdsLua = `{${userIds.map((id) => `"${id}"`).join(", ")}}`;
 
-        function updateLuaFile() {
-            const userIdInputs = document.getElementsByClassName('userIdInput');
-            const expiredDate = document.getElementById('expiredDate').value;
-            const luaFile = luaFileInput.files[0];
+        // Read the uploaded Lua file
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          let luaContent = event.target.result;
 
-            // Validate inputs
-            if (!luaFile) {
-                alert('Vui lòng tải lên file Lua.');
-                return;
-            }
-            const userIds = Array.from(userIdInputs).map(input => input.value.trim()).filter(id => id);
-            if (userIds.length === 0 || !expiredDate) {
-                alert('Vui lòng nhập ít nhất một User ID và chọn Expired Date.');
-                return;
-            }
+          // Replace userIds line
+          luaContent = luaContent.replace(
+            /local\s+userIds\s*=\s*\{[^}]*\}/,
+            `local userIds = ${userIdsLua}`
+          );
 
-            // Format userIds as Lua array
-            const userIdsLua = `{${userIds.map(id => `"${id}"`).join(', ')}}`;
+          // Replace expired_date line
+          luaContent = luaContent.replace(
+            /local\s+expired_date\s*=\s*".*"/,
+            `local expired_date = "${expiredDate}"`
+          );
 
-            // Format selected date to dd-mm-yyyy
-            const formattedDate = formatDate(expiredDate);
-
-            // Read the uploaded Lua file
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                let luaContent = event.target.result;
-
-                // Replace userIds line
-                luaContent = luaContent.replace(
-                    /local\s+userIds\s*=\s*\{[^}]*\}/,
-                    `local userIds = ${userIdsLua}`
-                );
-
-                // Replace expired_date line
-                luaContent = luaContent.replace(
-                    /local\s+expired_date\s*=\s*".*"/,
-                    `local expired_date = "${formattedDate}"`
-                );
-
-                // Create and download updated file
-                const blob = new Blob([luaContent], { type: 'text/x-lua' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'DC_Mobile_vi_updated.lua';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            };
-            reader.readAsText(luaFile);
-        }
-
-        // Set date picker to use dd-mm-yyyy format (browser-dependent workaround)
-        document.getElementById('expiredDate').addEventListener('change', function() {
-            this.value = formatDate(this.value);
-        });
+          // Create and download updated file
+          const blob = new Blob([luaContent], { type: "text/x-lua" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "DC_Mobile_vi_updated.lua";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        };
+        reader.readAsText(luaFile);
+      }
     </script>
-</body>
+  </body>
 </html>
